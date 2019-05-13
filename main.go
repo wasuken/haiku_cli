@@ -1,38 +1,26 @@
 package main
 
 import (
+	"./lib/database"
+	"./lib/search"
+	"./lib/shaping"
 	"fmt"
 	"os"
+	"strings"
 )
 
 func main() {
 	if len(os.Args) < 2 {
 		return
 	}
-	var height, width, haiku_count int
-	haiku_count = len(os.Args[1:])
-	haiku_ary := make([]string, haiku_count)
-	haiku_space := ""
-	for _, arg := range os.Args[1:] {
-		height += len(arg) - 1
-		haiku_ary[haiku_count-width-1] = haiku_space + arg
-		for i := 0; i < len(arg)/3-1; i++ {
-			haiku_space += " "
+	if os.Args[1] == "kigo_search" {
+		srs := search.Search("./kigo.sqlite3", strings.Join(os.Args[2:], " "))
+		for _, sr := range srs {
+			fmt.Printf("name:%s, class:%s\n", sr.Name, sr.KigoClass)
 		}
-		width++
-	}
-	for i := 0; i < len(haiku_ary[0]); i++ {
-		for j := 0; j < len(haiku_ary); j++ {
-			if i < len([]rune(haiku_ary[j])) {
-				if j < len(haiku_ary)-2 {
-					fmt.Print("  ")
-				}
-				fmt.Print(string([]rune(haiku_ary[j])[i]))
-				fmt.Print("  ")
-			} else {
-				fmt.Print("")
-			}
-		}
-		fmt.Println()
+	} else if os.Args[1] == "shaping" {
+		shaping.Shaping(os.Args[2:])
+	} else if os.Args[1] == "create_db" {
+		database.InsertKigo("./kigo.sqlite3")
 	}
 }
